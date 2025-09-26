@@ -149,7 +149,8 @@ finish() {
 	sed -i 's/x/ /g' new/desc.txt
 	ui_print "[+] Setting resolution and fps in desc "
 	cd new
-	zip -0 -FSr -q ../bootanimation.zip *
+	chmod -R 0755 $MODPATH/common/addon/magisk-zip-binary/zip-arm64
+	$MODPATH/common/addon/magisk-zip-binary/zip-arm64 -0 -FSr -q ../bootanimation.zip *
 	mkdir -p $MODPATH/system/media
 	cp_ch ../bootanimation.zip $MODPATH/system/media/bootanimation.zip
 	ui_print "[+] bootanimation.zip succesfully installed"
