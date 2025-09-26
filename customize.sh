@@ -1,66 +1,72 @@
-#! sh
+##########################################################################################
+#
+# MMT Extended Config Script
+#
+##########################################################################################
 
-if [ -z $MAGISK_VER ]; then
-	echo "If you see this in the installation process, please cancel it."
-	ui_print() { echo "$@" 1>&2; }
-	set_perm_recursive() { return; }
-	MODPATH=$PWD
-fi
+##########################################################################################
+# Config Flags
+##########################################################################################
 
-set_perm_recursive $MODPATH/tool root root 700 700
-fscan() {
-	FONTCONFIG_PATH=$MODPATH/tool LD_LIBRARY_PATH=$MODPATH/tool $MODPATH/tool/fc-scan "$@"
+# Uncomment and change 'MINAPI' and 'MAXAPI' to the minimum and maximum android version for your mod
+# Uncomment DYNLIB if you want libs installed to vendor for oreo+ and system for anything older
+# Uncomment PARTOVER if you have a workaround in place for extra partitions in regular magisk install (can mount them yourself - you will need to do this each boot as well). If unsure, keep commented
+# Uncomment PARTITIONS and list additional partitions you will be modifying (other than system and vendor), for example: PARTITIONS="/odm /product /system_ext"
+#MINAPI=21
+#MAXAPI=25
+#DYNLIB=true
+#PARTOVER=true
+#PARTITIONS="/odm"
+#APPVER=91
+#PAPPVER=43
+
+##########################################################################################
+# Replace list
+##########################################################################################
+
+# List all directories you want to directly replace in the system
+# Check the documentations for more info why you would need this
+
+# Construct your list in the following format
+# This is an example
+REPLACE_EXAMPLE="
+/system/app/Youtube
+/system/priv-app/SystemUI
+/system/priv-app/Settings
+/system/framework
+"
+
+# Construct your own list here
+REPLACE="
+"
+
+##########################################################################################
+# Permissions
+##########################################################################################
+
+set_permissions() {
+  : # Remove this if adding to this function
+
+  # Note that all files/folders in magisk module directory have the $MODPATH prefix - keep this prefix on all of your files/folders
+  # Some examples:
+  
+  # For directories (includes files in them):
+  # set_perm_recursive  <dirname>                <owner> <group> <dirpermission> <filepermission> <contexts> (default: u:object_r:system_file:s0)
+  
+  # set_perm_recursive $MODPATH/system/lib 0 0 0755 0644
+  # set_perm_recursive $MODPATH/system/vendor/lib/soundfx 0 0 0755 0644
+
+  # For files (not in directories taken care of above)
+  # set_perm  <filename>                         <owner> <group> <permission> <contexts> (default: u:object_r:system_file:s0)
+  
+  # set_perm $MODPATH/system/lib/libart.so 0 0 0644
+  # set_perm /data/local/tmp/file.txt 0 0 644
 }
 
-generate_config() {
+##########################################################################################
+# MMT Extended Logic - Don't modify anything after this
+##########################################################################################
 
-	if [ ! -f $font_config_file ]; then
-		return 0
-	fi
-
-	# tmpfile="$MODPATH/part_tmp.xml"
-	ui_print "Pull original $font_config_file"
-	mkdir -p $MODPATH/$font_dir/etc
-	# awk '{print >out}; /<familyset>/{out="'$tmpfile'"}' out=$MODPATH/$font_config_file $font_config_file
-	sed "/^<!-- <\/$config_end_mark> -->/q" $font_config_file >$MODPATH/$font_config_file
-	sed -i '$ d' $MODPATH/$font_config_file
-	echo "<!-- </$config_end_mark> -->" >>$MODPATH/$font_config_file
-
-	font_family_config=$sep'<family'$locale'>\n'$sep$sep'<font postScriptName="%{postscriptname}">%{file}</font>\n'$sep'</family>\n'
-	alia_config=$sep'<alias name="%{family[1]}" to="%{family[0]|downcase}" />\n'
-
-	cd $MODPATH/$font_dir/fonts/
-	for fontfile in *.*; do
-		ui_print "Add custom font $fontfile"
-		fscan -f "$font_family_config" "$fontfile" >>$MODPATH/$font_config_file
-		# fscan -f "%{family}" "$fontfile" | grep ',' >/dev/null
-		# if [ $? -eq 0 ]; then
-		# 	fscan -f "$alia_config" "$fontfile" >>$MODPATH/$font_config_file
-		# fi
-	done
-	cd /
-
-	# cat $tmpfile >>$MODPATH/$font_config_file
-	# rm $tmpfile
-	echo "</$config_end_mark>" >>$MODPATH/$font_config_file
-	cp $MODPATH/$font_config_file /data/local/tmp
-	ui_print "New $font_config_file generated"
-	ui_print ""
-}
-
-ui_print "Module directory is $MODPATH"
-
-# locale=' lang="zh-Hans"'
-locale=''
-
-font_dir="/system"
-font_config_file="$font_dir/etc/fonts.xml"
-config_end_mark="familyset"
-sep="\t"
-generate_config
-
-font_dir="/system"
-font_config_file="$font_dir/etc/font_fallback.xml"
-config_end_mark="familyset"
-sep="  "
-generate_config
+SKIPUNZIP=1
+unzip -qjo "$ZIPFILE" 'common/functions.sh' -d $TMPDIR >&2
+. $TMPDIR/functions.sh
