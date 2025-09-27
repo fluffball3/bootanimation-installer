@@ -11,6 +11,12 @@ sel_res() {
 		fi
 	fi
 	if [[ -z $SIZE ]]; then
+		ui_print "-> 1440x2560"
+		if chooseport; then
+			SIZE=1440x2560
+		fi
+	fi
+	if [[ -z $SIZE ]]; then
 		ui_print "-> No valid choice, using 1080x1920"
 		SIZE=1080x1920
 	fi
@@ -47,44 +53,65 @@ sel_fps() {
 		fi
 	fi
 	if [[ -z $FPS ]]; then
-		ui_print "-> No valid choice, using 25"
-		FPS=25
+		ui_print "-> No valid choice, using 60"
+		FPS=60
 	fi
 }
 
 sel_type() {
 	unset TYPE
 	unset SRCDIR
+	unset SIZE
+	unset FPS
 	ui_print "-> 1) Normal Nethunter"
 	if chooseport; then
-		TYPE=1
 		SRCDIR="$MODPATH/common/src"
+		SIZE=1440x2560
+		FPS=30
+		TYPE=1
 	fi
 	if [[ -z $TYPE ]]; then
 		ui_print "-> 2) Burning NetHunter"
 		if chooseport; then
-			TYPE=2
 			SRCDIR="$MODPATH/common/src_mk"
+			SIZE=1080x1920
+			FPS=60
+			TYPE=2
 		fi
 	fi
 	if [[ -z $TYPE ]]; then
 		ui_print "-> 3) New Kali Boot"
 		if chooseport; then
-			TYPE=3
 			SRCDIR="$MODPATH/common/src_kali"
+			SIZE=1080x1920
+			FPS=60
+			TYPE=3
 		fi
 	fi
 	if [[ -z $TYPE ]]; then
 		ui_print "-> 4) ct-OS"
 		if chooseport; then
-			TYPE=4
 			SRCDIR="$MODPATH/common/src_ctos"
+			SIZE=1080x1920
+			FPS=30
+			TYPE=4
+		fi
+	fi
+	if [[ -z $TYPE ]]; then
+		ui_print "-> 5) Import Custom"
+		if chooseport; then
+			SRCDIR="$MODPATH/common/src_custom"
+			SIZE=1080x1920
+			FPS=30
+			TYPE=5
 		fi
 	fi
 	if [[ -z $TYPE ]]; then
 		ui_print "-> No valid choice, using ct-OS"
-		TYPE=4
 		SRCDIR="$MODPATH/common/src_ctos"
+		SIZE=1080x1920
+		FPS=30
+		TYPE=4
 	fi
 }
 
@@ -105,6 +132,10 @@ sel_type() {
 #		CONVERT="y"
 #	fi
 #}
+errorfunc() {
+	ui_print "Custom directory empty! Make sure animations are imported then try again"
+	exit 1
+}
 
 finish() {
 # // converting doesn't work on android //
@@ -142,12 +173,20 @@ finish() {
 
 	ui_print "[i] Adding source parts.."
 	mkdir new
-	cp -r $SRCDIR/part* new/
+	if [ "$TYPE" == "5" ]; then
+		cp -r $SRCDIR/part* new/ || errorfunc
+	else
+		cp -r $SRCDIR/part* new/
+	fi
 	ui_print "[+] parts copied"
+
 	cp $SRCDIR/desc.txt new/
-	sed -i "1s/.*/$SIZE $FPS/" new/desc.txt
-	sed -i 's/x/ /g' new/desc.txt
-	ui_print "[+] Setting resolution and fps in desc "
+	if [ "$TYPE" != "5" ] || [ "$CHANGEANYWAY" == "1" ]; then
+		sed -i "1s/.*/$SIZE $FPS/" new/desc.txt
+		sed -i 's/x/ /g' new/desc.txt
+		ui_print "[+] Setting resolution and fps in desc "
+	fi
+
 	cd new
 	chmod -R 0755 $MODPATH/common/addon/magisk-zip-binary/zip-arm64
 	$MODPATH/common/addon/magisk-zip-binary/zip-arm64 -0 -FSr -q ../bootanimation.zip *
@@ -159,11 +198,12 @@ finish() {
 }
 
 # default values
-export TYPE=4
-export SIZE=1080x1920
-export FPS=25
-# export CONVERT="n"
 export SRCDIR="$MODPATH/common/src_ctos"
+export SIZE=1080x1920
+export FPS=30
+export TYPE=4
+export CHANGEANYWAY
+# export CONVERT
 
 ui_print " "
 ui_print "  ██████╗████████╗ ██████╗ ███████╗"
@@ -178,23 +218,38 @@ ui_print "|| NetHunter bootanimation install script ||"
 ui_print "     || by yesimxev and fluffball3 ||"
 ui_print " "
 ui_print " "
-ui_print "Default options are: ct-OS, 1080x1920, 25fps"
-ui_print "Do you want to change them?"
-ui_print "-> No"
+ui_print "Build default option ct-OS?"
+ui_print "-> Yes"
 if chooseport; then
 	finish
 else
 	ui_print "Please select from the following styles"
 	sel_type
 	ui_print " "
-	ui_print "Please enter the target resolution"
-	sel_res
-	ui_print " "
-	ui_print "Please enter the target fps. Higher values than 30 might look weird"
-	sel_fps
-	ui_print " "
-#	ui_print "Do you need the images to be converted? Select no if unsure"
-#	sel_conv
-#	ui_print " "
-	finish
+	if [ "$TYPE" == "5" ]; then
+		ui_print "Changing values of custom animations might result in worse quality"
+		ui_print "Do you wish to change them?"
+	else
+		ui_print "Use default values? (recommended)"
+	fi
+		ui_print "-> Yes"
+		ui_print " "
+		if chooseport; then
+			if [ "$TYPE" == "5" ]; then
+				CHANGEANYWAY=1
+			fi
+			finish
+		else
+			ui_print "Please enter the target resolution"
+			sel_res
+			ui_print " "
+			ui_print "Please enter the target fps. Higher values than 60 might look weird"
+			sel_fps
+			ui_print " "
+#			ui_print "Do you need the images to be converted? Select no if unsure"
+#			sel_conv
+#			ui_print " "
+			finish
+		fi
+	fi
 fi
