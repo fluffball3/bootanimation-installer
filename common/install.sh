@@ -63,6 +63,7 @@ sel_type() {
 	unset SRCDIR
 	unset SIZE
 	unset FPS
+	unset FINISHED
 	ui_print "-> 1) Normal Nethunter"
 	if chooseport; then
 		SRCDIR="$MODPATH/common/src"
@@ -104,6 +105,12 @@ sel_type() {
 			SIZE=1080x1920
 			FPS=30
 			TYPE=5
+			FINISHED=1
+			cp_ch $SRCDIR/bootanimation.zip $MODPATH/system/media/bootanimation.zip || unset FINISHED
+			if [[ -z $FINISHED ]]; then
+				FINISHED=1
+				cp_ch $SRCDIR/system/media/bootanimation.zip $MODPATH/system/media/bootanimation.zip || unset FINISHED
+			fi
 		fi
 	fi
 	if [[ -z $TYPE ]]; then
@@ -195,6 +202,7 @@ export SIZE=1080x1920
 export FPS=30
 export TYPE=4
 export CHANGEANYWAY
+export FINISHED
 # export CONVERT
 
 ui_print " "
@@ -218,31 +226,36 @@ else
 	ui_print "Please select from the following styles"
 	sel_type
 	ui_print " "
-	if [ "$TYPE" == "5" ]; then
-		ui_print "Changing values of custom animations might result in worse quality"
-		ui_print "Do you wish to change them?"
-		ui_print "-> No"
+	if [ "$FINISHED" == "1" ]; then
+		ui_print "[+] bootanimation.zip detected...."
+		ui_print "[+] bootanimation.zip succesfully installed"
 	else
-		ui_print "Use default values? (recommended)"
-		ui_print "-> Yes"
-	fi
-	ui_print " "
-	if chooseport; then
 		if [ "$TYPE" == "5" ]; then
-			CHANGEANYWAY=1
+			ui_print "Changing values of custom animations might result in worse quality"
+			ui_print "Do you wish to change them?"
+			ui_print "-> No"
+		else
+			ui_print "Use default values? (recommended)"
+			ui_print "-> Yes"
+		fi
+		ui_print " "
+		if chooseport; then
+			if [ "$TYPE" == "5" ]; then
+				CHANGEANYWAY=1
+				finish
+			fi
+		else
+			ui_print "Please enter the target resolution"
+			sel_res
+			ui_print " "
+			ui_print "Please enter the target fps. Higher values than 60 might look weird"
+			sel_fps
+			ui_print " "
+#			ui_print "Do you need the images to be converted? Select no if unsure"
+#			sel_conv
+#			ui_print " "
 			finish
 		fi
-	else
-		ui_print "Please enter the target resolution"
-		sel_res
-		ui_print " "
-		ui_print "Please enter the target fps. Higher values than 60 might look weird"
-		sel_fps
-		ui_print " "
-#		ui_print "Do you need the images to be converted? Select no if unsure"
-#		sel_conv
-#		ui_print " "
-		finish
 	fi
 fi
 
