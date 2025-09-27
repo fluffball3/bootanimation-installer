@@ -1,9 +1,9 @@
-# NetHunter Boot Animation Installer
-This module enables easy installation of NetHunter boot-animations.
+# Boot Animation Installer
+This module enables easy installation of NetHunter boot-animations and custom animations.
 
 For animations for Samsung devices, [check this repo.](https://github.com/John0n1/SMbootFX).
 
-# Custom Animations
+## Custom Animations
 
 Adding custom boot animations are possible. [You can find some here.](https://xdaforums.com/t/bootanimations-100-custom-flashable-bootanimations-for-all-resolutions.3059659/)
 
