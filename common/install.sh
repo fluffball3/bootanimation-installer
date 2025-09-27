@@ -132,10 +132,6 @@ sel_type() {
 #		CONVERT="y"
 #	fi
 #}
-errorfunc() {
-	ui_print "Custom directory empty! Make sure animations are imported then try again"
-	exit 1
-}
 
 finish() {
 # // converting doesn't work on android //
@@ -174,7 +170,7 @@ finish() {
 	ui_print "[i] Adding source parts.."
 	mkdir new
 	if [ "$TYPE" == "5" ]; then
-		cp -r $SRCDIR/part* new/ || errorfunc
+		cp -r $SRCDIR/part* new/ || ui_print "Custom directory empty! Make sure animations are imported then try again"
 	else
 		cp -r $SRCDIR/part* new/
 	fi
