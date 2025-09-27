@@ -7,9 +7,10 @@ For animations for Samsung devices, [check this repo.](https://github.com/John0n
 
 Adding custom boot animations are possible. [You can find some here.](https://xdaforums.com/t/bootanimations-100-custom-flashable-bootanimations-for-all-resolutions.3059659/)
 
-* To install custom animations, download and extract the animation zipfile to find "bootanimation.zip".
-* For safety purposes, directly installing bootanimation.zip is not allowed.
-* Extract bootanimation.zip and then paste the contents into the installer's src_custom folder
+* To install custom animations, download and extract the animation zipfile and also the module
+* Paste the "system" folder or the bootanimation.zip inside the module's src_custom folder (this method doesn't support changing default values)
+* To change resolution and fps values, instead of the previous method, extract the bootanimation.zip 
+* and then paste the contents into src_custom folder
 * Repack the installer back into a zip file
 
 ## Credits
