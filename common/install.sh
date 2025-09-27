@@ -169,11 +169,7 @@ finish() {
 
 	ui_print "[i] Adding source parts.."
 	mkdir new
-	if [ "$TYPE" == "5" ]; then
-		cp -r $SRCDIR/part* new/ || ui_print "Custom directory empty! Make sure animations are imported then try again"
-	else
-		cp -r $SRCDIR/part* new/
-	fi
+	cp -r $SRCDIR/part* new/ || ui_print "Custom directory empty! Make sure animations are imported then try again"
 	ui_print "[+] parts copied"
 
 	cp $SRCDIR/desc.txt new/
@@ -225,27 +221,28 @@ else
 	if [ "$TYPE" == "5" ]; then
 		ui_print "Changing values of custom animations might result in worse quality"
 		ui_print "Do you wish to change them?"
+		ui_print "-> No"
 	else
 		ui_print "Use default values? (recommended)"
-	fi
 		ui_print "-> Yes"
-		ui_print " "
-		if chooseport; then
-			if [ "$TYPE" == "5" ]; then
-				CHANGEANYWAY=1
-			fi
-			finish
-		else
-			ui_print "Please enter the target resolution"
-			sel_res
-			ui_print " "
-			ui_print "Please enter the target fps. Higher values than 60 might look weird"
-			sel_fps
-			ui_print " "
-#			ui_print "Do you need the images to be converted? Select no if unsure"
-#			sel_conv
-#			ui_print " "
+	fi
+	ui_print " "
+	if chooseport; then
+		if [ "$TYPE" == "5" ]; then
+			CHANGEANYWAY=1
 			finish
 		fi
+	else
+		ui_print "Please enter the target resolution"
+		sel_res
+		ui_print " "
+		ui_print "Please enter the target fps. Higher values than 60 might look weird"
+		sel_fps
+		ui_print " "
+#		ui_print "Do you need the images to be converted? Select no if unsure"
+#		sel_conv
+#		ui_print " "
+		finish
 	fi
 fi
+
