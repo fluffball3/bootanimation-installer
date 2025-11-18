@@ -1,6 +1,6 @@
 id=build-bootanimations
 name=Custom boot-animation Installer
-version=2.3
-versionCode=7
+version=2.4
+versionCode=8
 author=yesimxev & fluffball3
 description=Build and install Kali Nethunter boot animations using Magisk/KSU.

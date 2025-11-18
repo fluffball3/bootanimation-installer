@@ -106,11 +106,12 @@ sel_type() {
 			FPS=30
 			TYPE=5
 			FINISHED=1
-			cp_ch $SRCDIR/bootanimation.zip $MODPATH/system/media/bootanimation.zip || unset FINISHED
+			cp_ch $SRCDIR/bootanimation.zip $MODPATH/bootanimation.zip || unset FINISHED
 			if [[ -z $FINISHED ]]; then
 				FINISHED=1
-				cp_ch $SRCDIR/system/media/bootanimation.zip $MODPATH/system/media/bootanimation.zip || unset FINISHED
+				cp_ch $SRCDIR/system/media/bootanimation.zip $MODPATH/bootanimation.zip || unset FINISHED
 			fi
+			rm -f $MODPATH/bootanimation.zip
 		fi
 	fi
 	if [[ -z $TYPE ]]; then
@@ -119,6 +120,14 @@ sel_type() {
 		SIZE=1080x1920
 		FPS=30
 		TYPE=4
+	fi
+}
+
+sel_ver() {
+	unset ANDROID16
+	cp_ch $MODPATH/system/media/bootanimation.zip $SRCDIR/bootanimation.zip || ANDROID16=1
+	if [[ -z $ANDROID16 ]]; then
+		rm -f $SRCDIR/bootanimation.zip
 	fi
 }
 
@@ -189,8 +198,15 @@ finish() {
 	cd new
 	chmod -R 0755 $MODPATH/common/addon/magisk-zip-binary/zip-arm64
 	$MODPATH/common/addon/magisk-zip-binary/zip-arm64 -0 -FSr -q ../bootanimation.zip *
-	mkdir -p $MODPATH/system/media
-	cp_ch ../bootanimation.zip $MODPATH/system/media/bootanimation.zip
+
+	if [[ -z $ANDROID16 ]]; then
+		mkdir -p $MODPATH/system/media
+		cp_ch ../bootanimation.zip $MODPATH/system/media/bootanimation.zip
+	else
+		mkdir -p $MODPATH/system/product/media
+		cp_ch ../bootanimation.zip $MODPATH/system/product/media/bootanimation.zip
+	fi
+
 	ui_print "[+] bootanimation.zip succesfully installed"
 	cd ..
 	rm -r new
@@ -203,6 +219,7 @@ export FPS=30
 export TYPE=4
 export CHANGEANYWAY
 export FINISHED
+export ANDROID16
 # export CONVERT
 
 ui_print " "
@@ -220,6 +237,7 @@ ui_print " "
 ui_print " "
 ui_print "Build default option ct-OS?"
 ui_print "-> Yes"
+sel_ver
 if chooseport; then
 	finish
 else
