@@ -4,3 +4,4 @@ version=2.4
 versionCode=8
 author=yesimxev & fluffball3
 description=Build and install Kali Nethunter boot animations using Magisk/KSU.
+updateJson=https://raw.githubusercontent.com/fluffball3/bootanimation-installer/refs/heads/main/update.json
